@@ -69,10 +69,11 @@
                 new TrimbleMaps.LngLat(-74.659070, 40.342007),
                 new TrimbleMaps.LngLat(-74.599394, 40.361210)
             ],
-            isDraggable: true
+            isDraggable: true,
+            dataVersion: "PCM_NA"
             });
             
-                        // This data can be hard-coded, loaded from a file, or pulled from a service
+            // This data can be hard-coded, loaded from a file, or pulled from a service
             const geoJsonData = {
               type: 'geojson',
               data: {
@@ -109,8 +110,8 @@
                             'icon-allow-overlap': true,
                             'icon-size': 1
                         },
-        });
-      });
+                    });
+                });
 
                 // Listen for clicks on the hqPoints layer
                 map.on('click', 'hq', function(evt){
