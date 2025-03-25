@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<!--test page copied from website-->
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maps-sdk.trimblemaps.com/v3/trimblemaps-3.22.0.css">
+        <script src="https://maps-sdk.trimblemaps.com/v3/trimblemaps-3.22.0.js"></script>
+        <style>
+            body {
+                margin: 0;
+            }
+
+            #map {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 100%;
+            }
+        </style>
+    </head>
+<body>
+  <div id="map"></div>
+    <script>
+            TrimbleMaps.APIKey = 'F61E9A1295D8A342A868030A51DC3CA6';
+            const map = new TrimbleMaps.Map({
+            container: 'map', // container id
+            style: TrimbleMaps.Common.Style.TRANSPORTATION, //hosted style id
+            center: new TrimbleMaps.LngLat(-74.566234, 40.49944), // starting position, // starting position
+            zoom: 6 // starting zoom
+            });
+
+            // This data can be hard-coded, loaded from a file, or pulled from a service
+            function dictToParamString(obj) {
+                var str = [];
+                for (var p in obj) str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                return str.join("&");
+            }
+
+            reqhttp = new XMLHttpRequest();
+            var url = "https://pcmiler.alk.com/apis/rest/v1.0/Service.svc/polygons/state?";
+
+
+            var params = {
+            states: "NJ"
+            };
+
+            var urlQuery = url + dictToParamString(params);
+            reqhttp.open("GET", urlQuery, true);
+            reqhttp.setRequestHeader("Content-type", "application/json");
+            reqhttp.setRequestHeader("Authorization", TrimbleMaps.APIKey);
+            reqhttp.responseType = "json";
+
+            reqhttp.onreadystatechange = function () {
+
+                if (reqhttp.readyState == 4 && reqhttp.status == 200) {
+                    // Call a function when the state changes.
+                    nj_coord_array = getCoordinatesFromJSON(reqhttp.response);
+                    console.log(nj_coord_array)
+
+                    const geoJsonData = {
+                        type: 'geojson',
+                        data: {
+                            type: 'FeatureCollection',
+                            features: [{
+                                type: 'Feature',
+                                properties: {},
+                                geometry: {
+                                    type: 'Polygon',
+                                    coordinates: [
+                                        nj_coord_array
+                                    ]
+                                }
+                            }]
+                        }
+                    };
+                    
+                    map.on('load', function () {
+
+                        map.addSource('njSource', geoJsonData);
+
+                        // Add a layer to draw circles for each point in the data source
+                        map.addLayer({
+                            id: 'njPoly',
+                            type: 'fill',
+                            source: 'njSource',
+                            paint: {
+                                'fill-color': '#000',
+                                'fill-opacity': 0.5
+                            }
+                        });
+                        // Add a black outline around the polygon.
+                        map.addLayer({
+                            'id': 'njoutline',
+                            'type': 'line',
+                            'source': 'njSource',
+                            'layout': {},
+                            'paint': {
+                            'line-color': '#000',
+                            'line-width': 3
+                        }
+                    })
+            });
+            }
+        }
+            reqhttp.send();
+
+            reqhttp2 = new XMLHttpRequest();
+            params.states = "OH"
+
+            urlQuery = url + dictToParamString(params);
+            reqhttp2.open("GET", urlQuery, true);
+            reqhttp2.setRequestHeader("Content-type", "application/json");
+            reqhttp2.setRequestHeader("Authorization", TrimbleMaps.APIKey);
+            reqhttp2.responseType = "json";
+
+            reqhttp2.onreadystatechange = function () {
+
+                if (reqhttp2.readyState == 4 && reqhttp2.status == 200) {
+                    // Call a function when the state changes.
+                    oh_coord_array = getCoordinatesFromJSON(reqhttp2.response);
+                    console.log(oh_coord_array)
+
+                    const geoJsonData = {
+                        type: 'geojson',
+                        data: {
+                            type: 'FeatureCollection',
+                            features: [{
+                                type: 'Feature',
+                                properties: {},
+                                geometry: {
+                                    type: 'Polygon',
+                                    coordinates: [
+                                        oh_coord_array
+                                    ]
+                                }
+                            }]
+                        }
+                    };
+                    
+
+                    map.addSource('ohSource', geoJsonData);
+
+                        // Add a layer to draw circles for each point in the data source
+                    map.addLayer({
+                            id: 'ohPoly',
+                            type: 'fill',
+                            source: 'ohSource',
+                            paint: {
+                                'fill-color': '#000',
+                                'fill-opacity': 0.5
+                            }
+                        });
+                        // Add a black outline around the polygon.
+                    map.addLayer({
+                            'id': 'ohoutline',
+                            'type': 'line',
+                            'source': 'ohSource',
+                            'layout': {},
+                            'paint': {
+                            'line-color': '#000',
+                            'line-width': 3
+                        }
+                    });
+            }
+        }
+
+            function getCoordinatesFromJSON(res) {
+                coordinate_array = [];
+                if (res) {
+                    coord_string = res[0].Polygon.slice(10, -2);
+                    // console.log(coord_string)
+                    coord_string_array = coord_string.split(", ");
+                    // console.log(coord_string_array)
+                    for (var i = 0; i < coord_string_array.length; i++) {
+                        coords = coord_string_array[i].split(" ");
+                        // console.log(coords)
+                        num_coords = [];
+                        for (const coord of coords){
+                            num_coord = parseFloat(coord, 10)
+                            num_coords.push(num_coord);
+                        }
+                        coordinate_array.push(num_coords);
+                    }
+                }
+                console.log(coordinate_array)
+                return coordinate_array;
+            }
+
+            reqhttp2.send();
+            
+
+    </script>
+  </body>
+</html>
+
