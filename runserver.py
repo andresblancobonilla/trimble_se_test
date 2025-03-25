@@ -2,7 +2,7 @@
 
 #-----------------------------------------------------------------------
 # runserver.py
-# Author: Bob Dondero
+# Author: Andres Blanco Bonilla
 #-----------------------------------------------------------------------
 import sys
 import route_test
@@ -19,7 +19,7 @@ def main():
         sys.exit(1)
 
     try:
-        route_test.app.run(host='0.0.0.0', port=port, debug=True)
+        route_test.app.run(host='0.0.0.0', port=port, debug=False)
     except Exception as ex:
         print(ex, file=sys.stderr)
         sys.exit(1)

@@ -24,22 +24,114 @@
 
         <script>
             TrimbleMaps.APIKey = 'F61E9A1295D8A342A868030A51DC3CA6';
+
             const map = new TrimbleMaps.Map({
                 container: 'map',
                 style: TrimbleMaps.Common.Style.TRANSPORTATION,
                 center: new TrimbleMaps.LngLat(-74.566234, 40.49944),
                 zoom: 8
             });
+
+            // const home_address = {
+            //     streetAddress: "506 Samuel Street",
+            //     city: "Hamilton",
+            //     state: "NJ",
+            //     zip: "08610",
+            //     county: "Mercer", 
+            //     country: "United States"};
+
+            // const work_address = {
+            //     streetAddress: "1 Independence Way",
+            //     city: "Princeton",
+            //     state: "NJ",
+            //     zip: "08540",
+            //     county: "Mercer", 
+            //     country: "United States"};
+            
+            // const home_stop_options = {
+            //     id:"origin", 
+            //     label:"Home",
+            //     lngLat: new TrimbleMaps.LngLat(-74.73082, 40.20334),
+            //     address: home_address};
+
+            // const wawa_address = {
+            //     streetAddress:"152 Alexander Street",
+            //     city:"Princeton",
+            //     state:"NJ",
+            //     zip:"08540",
+            //     county:"Mercer", 
+            //     country:"United States"};
+
             const myRoute = new TrimbleMaps.Route({
             routeId: "myRoute",
             stops: [
-              new TrimbleMaps.LngLat(-74.566234, 40.49944),
-              new TrimbleMaps.LngLat(-74.629749, 40.26118)
-            ]
+                new TrimbleMaps.LngLat(-74.73082, 40.20334),
+                new TrimbleMaps.LngLat(-74.659070, 40.342007),
+                new TrimbleMaps.LngLat(-74.599394, 40.361210)
+            ],
+            isDraggable: true
             });
+            
+                        // This data can be hard-coded, loaded from a file, or pulled from a service
+            const geoJsonData = {
+              type: 'geojson',
+              data: {
+                type: 'FeatureCollection',
+                features: [{
+                  type: 'Feature',
+                  properties: {
+                    name: 'Emma Bloomberg Center for Access & Opportunity at Princeton University'
+                  },
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [-74.661552, 40.347118]
+                  }
+                }]
+              }
+            };
+
+            // Wait for the map to load before adding
             map.on('load', function() {
-              myRoute.addTo(map);
-            });
+
+                myRoute.addTo(map);
+                    
+                // Add datasource
+                map.addSource('hqSource', geoJsonData);
+
+
+                // Add layer to render marker based on datasource
+                map.addLayer({
+                        id: 'hq',
+                        type: 'symbol',
+                        source: 'hqSource',
+                        layout: {
+                            'icon-image': 'star-fill-blue',
+                            'icon-allow-overlap': true,
+                            'icon-size': 1
+                        },
+        });
+      });
+
+                // Listen for clicks on the hqPoints layer
+                map.on('click', 'hq', function(evt){
+                    const popupLocation = evt.features[0].geometry.coordinates.slice();
+                    const popupContent = evt.features[0].properties.name;
+
+                    new TrimbleMaps.Popup()
+                        .setLngLat(popupLocation)
+                        .setHTML(popupContent)
+                        .addTo(map);
+                    });
+
+                    // Change cursor when hovering over a feature on the hqPoints layer
+                    map.on('mouseenter', 'hq', function() {
+                    map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    // Change cursor back
+                    map.on('mouseleave', 'hq', function() {
+                    map.getCanvas().style.cursor = '';
+                });
         </script>
     </body>
 </html>
