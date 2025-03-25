@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<!--test page copied from website-->
+<!--test page adapted from Trimble Maps documentation-->
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -24,13 +24,12 @@
     <script>
             TrimbleMaps.APIKey = 'F61E9A1295D8A342A868030A51DC3CA6';
             const map = new TrimbleMaps.Map({
-            container: 'map', // container id
-            style: TrimbleMaps.Common.Style.TRANSPORTATION, //hosted style id
-            center: new TrimbleMaps.LngLat(-74.566234, 40.49944), // starting position, // starting position
-            zoom: 5 // starting zoom
+            container: 'map',
+            style: TrimbleMaps.Common.Style.TRANSPORTATION,
+            center: new TrimbleMaps.LngLat(-74.566234, 40.49944),
+            zoom: 5
             });
 
-            // This data can be hard-coded, loaded from a file, or pulled from a service
             function dictToParamString(obj) {
                 var str = [];
                 for (var p in obj) str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
@@ -40,12 +39,11 @@
             function getCoordinatesFromJSON(res) {
                 if (res) {
                     all_coord_string = res.Polygon.slice(10, -2);
-                    // console.log(coord_string)
+                    // console.log(all_coord_string)
                     coord_sets = all_coord_string.split("), (");
                     // console.log(coord_sets)
                     all_coordinate_array = []
                     for (let coord_set of coord_sets) {
-                        // console.log("coord_set")
                         // console.log(coord_set)
                         coordinate_array = []
                         coord_strings = coord_set.split(", ")
@@ -53,17 +51,17 @@
                         for (let coord_string of coord_strings) {
                             coords = coord_string.split(" ");
                             // console.log(coords)
-                            num_coords = [];
+                            float_coords = [];
                             for (let coord of coords){
-                                num_coord = parseFloat(coord, 10);
-                                num_coords.push(num_coord);
+                                float_coord = parseFloat(coord, 10);
+                                float_coords.push(float_coord);
                             }
-                            coordinate_array.push(num_coords);
+                            coordinate_array.push(float_coords);
                         }
                         all_coordinate_array.push(coordinate_array)
                     }
                 }
-                console.log(all_coordinate_array)
+                // console.log(all_coordinate_array)
                 return all_coordinate_array;
             }
 
@@ -94,7 +92,7 @@
                     map.on('load', function () {
 
                         states = params.states.split(",")
-                        for (let i = 0; i < states_coords.length; i++){
+                        for (let i = 0; i < states_coords.length; i++) {
                             state_coords = states_coords[i];
                             for (let j = 0; j < state_coords.length; j++) {
                                 // console.log(states[i] + 'Source' + j)
@@ -114,8 +112,9 @@
                                         }]
                                     }};
 
-                                map.addSource(states[i] + 'Source' + j, geoJsonData);
-                                // Add a layer to draw circles for each point in the data source
+                                map.addSource(states[i] + 'Source' + j,
+                                 geoJsonData);
+
                                 map.addLayer({
                                     id: states[i] + 'Poly' + j,
                                     type: 'fill',
@@ -140,216 +139,8 @@
                     }
                 })
             }};
-            
+
             reqhttp.send();
-
-        //     reqhttp2 = new XMLHttpRequest();
-        //     params.states = "OH"
-
-        //     urlQuery = url + dictToParamString(params);
-        //     reqhttp2.open("GET", urlQuery, true);
-        //     reqhttp2.setRequestHeader("Content-type", "application/json");
-        //     reqhttp2.setRequestHeader("Authorization", TrimbleMaps.APIKey);
-        //     reqhttp2.responseType = "json";
-
-        //     reqhttp2.onreadystatechange = function () {
-
-        //         if (reqhttp2.readyState == 4 && reqhttp2.status == 200) {
-        //             // Call a function when the state changes.
-        //             oh_coord_array = getCoordinatesFromJSON(reqhttp2.response);
-        //             console.log(oh_coord_array)
-
-        //             const geoJsonData = {
-        //                 type: 'geojson',
-        //                 data: {
-        //                     type: 'FeatureCollection',
-        //                     features: [{
-        //                         type: 'Feature',
-        //                         properties: {},
-        //                         geometry: {
-        //                             type: 'Polygon',
-        //                             coordinates: [
-        //                                 oh_coord_array
-        //                             ]
-        //                         }
-        //                     }]
-        //                 }
-        //             };
-                    
-
-        //             map.addSource('ohSource', geoJsonData);
-
-        //                 // Add a layer to draw circles for each point in the data source
-        //             map.addLayer({
-        //                     id: 'ohPoly',
-        //                     type: 'fill',
-        //                     source: 'ohSource',
-        //                     paint: {
-        //                         'fill-color': '#000',
-        //                         'fill-opacity': 0.5
-        //                     }
-        //                 });
-        //                 // Add a black outline around the polygon.
-        //             map.addLayer({
-        //                     'id': 'ohoutline',
-        //                     'type': 'line',
-        //                     'source': 'ohSource',
-        //                     'layout': {},
-        //                     'paint': {
-        //                     'line-color': '#000',
-        //                     'line-width': 3
-        //                 }
-        //             });
-        //     }
-        // }
-                    // console.log(nj_coord_array)
-
-                    // const geoJsonData_set1 = {
-                    //     type: 'geojson',
-                    //     data: {
-                    //         type: 'FeatureCollection',
-                    //         features: [{
-                    //             type: 'Feature',
-                    //             properties: {},
-                    //             geometry: {
-                    //                 type: 'Polygon',
-                    //                 coordinates: [
-                    //                     nj_coord_array[0]
-                    //                 ]
-                    //             }
-                    //         },
-                    //     ]
-                    //     }
-                    // };
-
-                    // const geoJsonData_set2 = {
-                    //     type: 'geojson',
-                    //     data: {
-                    //         type: 'FeatureCollection',
-                    //         features: [{
-                    //             type: 'Feature',
-                    //             properties: {},
-                    //             geometry: {
-                    //                 type: 'Polygon',
-                    //                 coordinates: [
-                    //                     nj_coord_array[1]
-                    //                 ]
-                    //             }
-                    //         },
-                    //     ]
-                    //     }
-                    // };
-
-                    // const geoJsonData_set3 = {
-                    //     type: 'geojson',
-                    //     data: {
-                    //         type: 'FeatureCollection',
-                    //         features: [{
-                    //             type: 'Feature',
-                    //             properties: {},
-                    //             geometry: {
-                    //                 type: 'Polygon',
-                    //                 coordinates: [
-                    //                     nj_coord_array[2]
-                    //                 ]
-                    //             }
-                    //         },
-                    //     ]
-                    //     }
-                    // };
-
-            // reqhttp2.send();
-//             //                 coordinates: [
-//             //                     [
-//                                   [ -74.044396, 40.688542 ],
-//                                   [ -74.044569, 40.688581 ],
-//                                   [ -74.044794, 40.688658 ],
-//                                   [ -74.045074, 40.688735 ],
-//                                   [ -74.044396, 40.688542 ]
-//                                   [ -74.04537, 40.688878 ],
-//                                   [ -74.045616, 40.689022 ],
-//                                   [ -74.045883, 40.689143 ],
-//                                   [ -74.046144, 40.68927 ],
-//                                   [ -74.04647, 40.68949 ],
-//                                   [ -74.04657, 40.689639 ],
-//                                   [ -74.046751, 40.689859 ],
-//                                   [ -74.046995, 40.690173 ],
-//                                   [ -74.047285, 40.690503 ],
-//                                   [ -74.047133, 40.690542 ],
-//                                   [ -74.047104, 40.690564 ],
-//                                   [ -74.047119, 40.690646 ],
-//                                   [ -74.047184, 40.690685 ],
-//                                   [ -74.047212, 40.690723 ],
-//                                   [ -74.047234, 40.69085 ],
-//                                   [ -74.047249, 40.690999 ],
-//                                   [ -74.047169, 40.691114 ],
-//                                   [ -74.047097, 40.691142 ],
-//                                   [ -74.046895, 40.691125 ],
-//                                   [ -74.046568, 40.691147 ],
-//                                   [ -74.046265, 40.691158 ],
-//                                   [ -74.04607, 40.691185 ],
-//                                   [ -74.04586, 40.691102 ],
-//                                   [ -74.045297, 40.690899 ],
-//                                   [ -74.044848, 40.690728 ],
-//                                   [ -74.044531, 40.690584 ],
-//                                   [ -74.044279, 40.690463 ],
-//                                   [ -74.044048, 40.690309 ],
-//                                   [ -74.043931, 40.690225 ],
-//                                   [ -74.043917, 40.690215 ],
-//                                   [ -74.043773, 40.690083 ],
-//                                   [ -74.043664, 40.689935 ],
-//                                   [ -74.043556, 40.689725 ],
-//                                   [ -74.043521, 40.689588 ],
-//                                   [ -74.043513, 40.689274 ],
-//                                   [ -74.043556, 40.689147 ],
-//                                   [ -74.043586, 40.688982 ],
-//                                   [ -74.043658, 40.688861 ],
-//                                   [ -74.043803, 40.688757 ],
-//                                   [ -74.043977, 40.688658 ],
-//                                   [ -74.044208, 40.688608 ],
-//                                   [ -74.044396, 40.688542 ]
-//             //                     ]
-//             -74.04537, 40.688878
-// -74.045616, 40.689022
-// -74.045883, 40.689143
-// -74.046144, 40.68927
-// -74.04647, 40.68949
-// -74.04657, 40.689639
-// -74.046751, 40.689859
-// -74.046995, 40.690173
-// -74.047285, 40.690503
-// -74.047133, 40.690542
-// -74.047104, 40.690564
-// -74.047119, 40.690646
-// -74.047184, 40.690685
-// -74.047212, 40.690723
-// -74.047234, 40.69085
-// -74.047249, 40.690999
-// -74.047169, 40.691114
-// -74.047097, 40.691142
-// -74.046895, 40.691125
-// -74.046568, 40.691147
-// -74.046265, 40.691158
-// -74.04607, 40.691185
-// -74.04586, 40.691102
-// -74.045297, 40.690899
-// -74.044848, 40.690728
-// -74.044531, 40.690584
-// -74.044279, 40.690463
-// -74.044048, 40.690309
-// -74.043931, 40.690225
-// -74.043917, 40.690215
-// -74.043773, 40.690083
-// -74.043664, 40.689935
-// -74.043556, 40.689725
-// -74.043521, 40.689588
-// -74.043513, 40.689274
-// -74.043556, 40.689147
-// -74.043586, 40.688982
-// -74.043658, 40.688861
-// -74.043803, 40.688757                                  -74.043977, 40.688658                                -74.044208, 40.688608
-// -74.044396, 40.688542
-
     </script>
   </body>
 </html>
