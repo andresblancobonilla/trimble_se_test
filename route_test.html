@@ -1,6 +1,9 @@
-
+<!----------------------------------------------------------------------
+route_test.html
+Author: Andres Blanco Bonilla (adapted from Trimble Maps documentation)
+Page displays an interactive route from my house to Trimble (Exercise 1)
+----------------------------------------------------------------------->
 <!DOCTYPE html>
-<!--test page adapted from website-->
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -107,8 +110,7 @@
                     0: TrimbleMaps.Common.VehicleType.TRUCK,
                     1: TrimbleMaps.Common.VehicleType.LIGHT_TRUCK,
                     2: TrimbleMaps.Common.VehicleType.AUTOMOBILE,
-
-                }
+                };
 
             const hazmat_types = {
                     0: TrimbleMaps.Common.HazMatType.NONE,
@@ -120,7 +122,7 @@
                     6: TrimbleMaps.Common.HazMatType.RADIOACTIVE,
                     7: TrimbleMaps.Common.HazMatType.HARMFUL_TO_WATER,
                     8: TrimbleMaps.Common.HazMatType.TUNNEL
-                }
+                };
             
             const myRoute = new TrimbleMaps.Route({
             routeId: "myRoute",
@@ -157,7 +159,7 @@
               }
             };
 
-
+            // Updates routes when dropdowns or sliders are changed.
             function updateRoute(){
                 myRoute.update({
                     vehicleType: vehicle_types[document.getElementById("params-vehType").value],
@@ -174,7 +176,7 @@
             myRoute.on('report', function(response) {
                 let report = response[0];
                 // console.log(report)
-                total_eta = report.ReportLines.slice([-1])[0].THours
+                let total_eta = report.ReportLines.slice([-1])[0].THours
                 let result = document.getElementById('result');
                 result.innerHTML = 'Total Estimated Travel Time: ' + total_eta + " hours";
             });

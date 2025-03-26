@@ -1,6 +1,9 @@
-
+<!----------------------------------------------------------------------
+nj_map.html
+Author: Andres Blanco Bonilla (adapted from Trimble Maps documentation)
+Page displays a map with outlines of NJ, PA, and WV (Exercise 2)
+----------------------------------------------------------------------->
 <!DOCTYPE html>
-<!--test page adapted from Trimble Maps documentation-->
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -23,6 +26,7 @@
   <div id="map"></div>
     <script>
             TrimbleMaps.APIKey = 'F61E9A1295D8A342A868030A51DC3CA6';
+
             const map = new TrimbleMaps.Map({
             container: 'map',
             style: TrimbleMaps.Common.Style.SATELLITE,
@@ -35,30 +39,32 @@
                 for (var p in obj) str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
                 return str.join("&");
             }
-
+            // This function takes the json HTTP response and returns
+            // an array of the array(s) of coordinates for each state.
+            // Ex: [[[x,y][x,y]..],[[x,y][x,y]..],[[x,y][x,y]..]]
             function getCoordinatesFromJSON(res) {
+                let all_coordinate_array = [];
                 if (res) {
-                    all_coord_string = res.Polygon.slice(10, -2);
+                    let all_coord_string = res.Polygon.slice(10, -2);
                     // console.log(all_coord_string)
-                    coord_sets = all_coord_string.split("), (");
+                    let coord_sets = all_coord_string.split("), (");
                     // console.log(coord_sets)
-                    all_coordinate_array = []
                     for (let coord_set of coord_sets) {
                         // console.log(coord_set)
-                        coordinate_array = []
-                        coord_strings = coord_set.split(", ")
+                        let coordinate_array = [];
+                        let coord_strings = coord_set.split(", ")
                         // console.log(coord_strings)
                         for (let coord_string of coord_strings) {
-                            coords = coord_string.split(" ");
+                            let coords = coord_string.split(" ");
                             // console.log(coords)
-                            float_coords = [];
+                            let float_coords = [];
                             for (let coord of coords){
-                                float_coord = parseFloat(coord, 10);
+                                let float_coord = parseFloat(coord, 10);
                                 float_coords.push(float_coord);
                             }
                             coordinate_array.push(float_coords);
                         }
-                        all_coordinate_array.push(coordinate_array)
+                        all_coordinate_array.push(coordinate_array);
                     }
                 }
                 // console.log(all_coordinate_array)
@@ -67,7 +73,6 @@
 
             reqhttp = new XMLHttpRequest();
             var url = "https://pcmiler.alk.com/apis/rest/v1.0/Service.svc/polygons/state?";
-
 
             var params = {
                 states: "NJ,PA,WV"
@@ -79,21 +84,22 @@
             reqhttp.setRequestHeader("Authorization", TrimbleMaps.APIKey);
             reqhttp.responseType = "json";
 
+            // Adds a layer on the map for every polygon of every state.
             reqhttp.onreadystatechange = function () {
 
                 if (reqhttp.readyState == 4 && reqhttp.status == 200) {
 
-                    states_coords = [] ;
+                    let states_coords = [];
                     for (let state_response of reqhttp.response) {
-                        state_coords = getCoordinatesFromJSON(state_response);
+                        let state_coords = getCoordinatesFromJSON(state_response);
                         states_coords.push(state_coords);
                     }
 
                     map.on('load', function () {
 
-                        states = params.states.split(",")
+                        let states = params.states.split(",");
                         for (let i = 0; i < states_coords.length; i++) {
-                            state_coords = states_coords[i];
+                            let state_coords = states_coords[i];
                             for (let j = 0; j < state_coords.length; j++) {
                                 // console.log(states[i] + 'Source' + j)
                                 geoJsonData = {
@@ -141,8 +147,7 @@
             }};
 
             reqhttp.send();
+
     </script>
   </body>
 </html>
-
-
