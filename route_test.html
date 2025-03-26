@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<!--test page copied from website-->
+<!--test page adapted from website-->
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -9,6 +9,7 @@
         <style>
             body {
                 margin: 0;
+                padding:0;
             }
 
             #map {
@@ -16,10 +17,80 @@
                 top: 0;
                 bottom: 0;
                 width: 100%;
+                z-index: -1;
             }
+
+            #menu {
+                background: #fff;
+                font-family: 'Open Sans', sans-serif;
+                padding: 10px;
+                position: absolute;
+                right: 8px;
+                top: 8px;
+                overflow: scroll;
+                z-index: 1;
+            }
+
         </style>
     </head>
     <body>
+        <div id="menu">
+        <table id="queryParams" class="table table-sm notranslate">
+            <tbody>
+            <tr>
+            <td>
+            <label class="param-region" for="params-vehType">Vehicle Type</label>
+            </td><td>
+            <select id="params-vehType" onchange=updateRoute()>
+                <option selected value=0>Truck</option>
+                <option value=1>Light Truck</option>
+                <option value=2>Automobile</option>
+            </select>
+            </td></tr>
+            <tr>
+            <td>
+            <label class="param-region" for="params-hazMat">Hazardous Materials</label>
+            </td><td>
+            <select id="params-hazMat" onchange=updateRoute()>
+                <option selected value=0>None</option>
+                <option value=1>General</option>
+                <option value=2>Caustic</option>
+                <option value=3>Explosives</option>
+                <option value=4>Flammable</option>
+                <option value=5>Inhalants</option>
+                <option value=6>Radioactive</option>
+                <option value=7>HarmfulToWater</option>
+                <option value=8>Tunnel</option>
+            </select>
+            </td></tr>
+            <tr>
+            <td>
+            <label class="param-region" for="params-vehHeight">Vehicle Height</label>
+            </td>
+            <td>
+            <input type="range" min=60 max=180 value=120 class="slider" id="params-vehHeight" onchange=updateRoute()>
+            </td></tr><tr>
+            <td>
+            <label class="param-region" for="params-vehLength">Vehicle Length</label>
+            </td>
+            <td>
+            <input type="range" min=96 max=840 value=516 class="slider" id="params-vehLength" onchange=updateRoute()>
+            </td></tr><tr>
+            <td>
+            <label class="param-region" for="params-vehWidth">Vehicle Width</label>
+            </td>
+            <td>
+            <input type="range" min=60 max=102 value=81 class="slider" id="params-vehWidth" onchange=updateRoute()>
+            </td></tr><tr>
+            <td>
+            <label class="param-region" for="params-vehWeight">Vehicle Weight</label>
+            </td>
+            <td>
+            <input type="range" min=1500 max=156470 value=78985 class="slider" id="params-vehWeight" onchange=updateRoute()>
+            </td></tr>
+        </tbody></table>
+        <p id = "result"></p>
+        </div>
         <div id="map"></div>
 
         <script>
@@ -32,48 +103,43 @@
                 zoom: 8
             });
 
-            // const home_address = {
-            //     streetAddress: "506 Samuel Street",
-            //     city: "Hamilton",
-            //     state: "NJ",
-            //     zip: "08610",
-            //     county: "Mercer", 
-            //     country: "United States"};
+            const vehicle_types = {
+                    0: TrimbleMaps.Common.VehicleType.TRUCK,
+                    1: TrimbleMaps.Common.VehicleType.LIGHT_TRUCK,
+                    2: TrimbleMaps.Common.VehicleType.AUTOMOBILE,
 
-            // const work_address = {
-            //     streetAddress: "1 Independence Way",
-            //     city: "Princeton",
-            //     state: "NJ",
-            //     zip: "08540",
-            //     county: "Mercer", 
-            //     country: "United States"};
+                }
+
+            const hazmat_types = {
+                    0: TrimbleMaps.Common.HazMatType.NONE,
+                    1: TrimbleMaps.Common.HazMatType.GENERAL,
+                    2: TrimbleMaps.Common.HazMatType.CAUSTIC,
+                    3: TrimbleMaps.Common.HazMatType.EXPLOSIVES,
+                    4: TrimbleMaps.Common.HazMatType.FLAMMABLE,
+                    5: TrimbleMaps.Common.HazMatType.INHALANTS,
+                    6: TrimbleMaps.Common.HazMatType.RADIOACTIVE,
+                    7: TrimbleMaps.Common.HazMatType.HARMFUL_TO_WATER,
+                    8: TrimbleMaps.Common.HazMatType.TUNNEL
+                }
             
-            // const home_stop_options = {
-            //     id:"origin", 
-            //     label:"Home",
-            //     lngLat: new TrimbleMaps.LngLat(-74.73082, 40.20334),
-            //     address: home_address};
-
-            // const wawa_address = {
-            //     streetAddress:"152 Alexander Street",
-            //     city:"Princeton",
-            //     state:"NJ",
-            //     zip:"08540",
-            //     county:"Mercer", 
-            //     country:"United States"};
-
             const myRoute = new TrimbleMaps.Route({
             routeId: "myRoute",
+            reportType: [TrimbleMaps.Common.ReportType.MILEAGE],
             stops: [
                 new TrimbleMaps.LngLat(-74.73082, 40.20334),
                 new TrimbleMaps.LngLat(-74.659070, 40.342007),
                 new TrimbleMaps.LngLat(-74.599394, 40.361210)
             ],
             isDraggable: true,
-            dataVersion: "PCM_NA"
+            dataVersion: "PCM_NA",
+            vehicleType: vehicle_types[document.getElementById("params-vehType").value],
+            hazMatType: hazmat_types[document.getElementById("params-hazMat").value],
+            trkHeight: document.getElementById("params-vehHeight").value,
+            trkLength: document.getElementById("params-vehLength").value,
+            trkWidth: document.getElementById("params-vehWidth").value,
+            trkWeight: document.getElementById("params-vehWeight").value,
             });
             
-            // This data can be hard-coded, loaded from a file, or pulled from a service
             const geoJsonData = {
               type: 'geojson',
               data: {
@@ -91,20 +157,38 @@
               }
             };
 
-            // Wait for the map to load before adding
+
+            function updateRoute(){
+                myRoute.update({
+                    vehicleType: vehicle_types[document.getElementById("params-vehType").value],
+                    hazMatType: hazmat_types[document.getElementById("params-hazMat").value],
+                    trkHeight: document.getElementById("params-vehHeight").value,
+                    trkLength: document.getElementById("params-vehLength").value,
+                    trkWidth: document.getElementById("params-vehWidth").value,
+                    trkWeight: document.getElementById("params-vehWeight").value,
+                });
+            }
+ 
+     
+
+            myRoute.on('report', function(response) {
+                let report = response[0];
+                // console.log(report)
+                total_eta = report.ReportLines.slice([-1])[0].THours
+                let result = document.getElementById('result');
+                result.innerHTML = 'Total Estimated Travel Time: ' + total_eta + " hours";
+            });
+
             map.on('load', function() {
 
                 myRoute.addTo(map);
-                    
-                // Add datasource
-                map.addSource('hqSource', geoJsonData);
+                
+                map.addSource('ebcaoSource', geoJsonData);
 
-
-                // Add layer to render marker based on datasource
                 map.addLayer({
-                        id: 'hq',
+                        id: 'ebcao',
                         type: 'symbol',
-                        source: 'hqSource',
+                        source: 'ebcaoSource',
                         layout: {
                             'icon-image': 'star-fill-blue',
                             'icon-allow-overlap': true,
@@ -113,8 +197,7 @@
                     });
                 });
 
-                // Listen for clicks on the hqPoints layer
-                map.on('click', 'hq', function(evt){
+                map.on('click', 'ebcao', function(evt){
                     const popupLocation = evt.features[0].geometry.coordinates.slice();
                     const popupContent = evt.features[0].properties.name;
 
@@ -124,13 +207,11 @@
                         .addTo(map);
                     });
 
-                    // Change cursor when hovering over a feature on the hqPoints layer
-                    map.on('mouseenter', 'hq', function() {
+                    map.on('mouseenter', 'ebcao', function() {
                     map.getCanvas().style.cursor = 'pointer';
                     });
 
-                    // Change cursor back
-                    map.on('mouseleave', 'hq', function() {
+                    map.on('mouseleave', 'ebcao', function() {
                     map.getCanvas().style.cursor = '';
                 });
         </script>
